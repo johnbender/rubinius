@@ -68,20 +68,8 @@ output = ARGV.shift
 
 puts "Rendering profiling from '#{file}' to '#{output}'"
 
-data = JSON.load File.read(file)
-
+data = JSON.load(File.read(file))
 project_root = Pathname.new(File.expand_path('../../../', __FILE__))
 template = File.join(project_root, "projects", "profiler", "output.html.erb")
-
-thread_nodes = data.inject("") do |acc, th_data|
-  acc += "<div class=\"thread\">Thread #{th_data['thread_id']}</div>"
-  acc += "<ul name=\"thread\">"
-
-  th_data["roots"].each do |n_id|
-    acc = print_node(n_id, th_data)
-  end
-
-  acc += "</ul>"
-end
 
 File.open(output, "w").puts(ERB.new(File.open(template).read).result(binding))

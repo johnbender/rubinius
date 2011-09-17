@@ -543,7 +543,15 @@ to hide all nodes marked with time values lower than <i>d</i>.<br>
 <img src="http://asset.rubini.us/empty.png"> Use n and p to navigate between threads.<br>
 <img src="http://asset.rubini.us/empty.png"> Click on background to move focus to a subtree.<br>
 </div>
-<%= thread_nodes %>
+<% data.inject("") do |acc, th_data| %>
+<div class="thread">Thread <%= th_data['thread_id'] %></div>
+<ul name="thread">
+  <% th_data["roots"].each do |n_id| %>
+  <%= print_node(n_id, th_data) %>
+  <% end %>
+</ul>
+<% end %>
+
 <div id="sentinel"></div>
   </body>
 </html>
