@@ -28,8 +28,7 @@ def print_node(id, data, depth=0)
 
   self_prec = "%.2f" % [100.0 * (s / data['runtime'].to_f)]
 
-  template = File.join(project_root, "projects", "profiler", "nodes.html.erb")
-  ERB.new(File.open(template).read).result(binding)
+  ERB.new(nodes).result(binding)
 end
 
 def sub_nodes(node, data)
@@ -43,7 +42,29 @@ def sub_nodes(node, data)
 end
 
 def project_root
-  Pathname.new(File.expand_path('../../../', __FILE__))
+  File.join(Pathname.new(File.expand_path('../../../', __FILE__)), "projects", "profiler")
+end
+
+def project_file_read(file)
+  File.open(File.join(project_root, file)).read
+end
+
+def template
+  project_file_read("output.html.erb")
+end
+
+# NOTE style and js serialized here to avoid dealing with
+# pathing issues in the template output
+def css
+  project_file_read("all.css")
+end
+
+def js
+  project_file_read("all.js")
+end
+
+def nodes
+  project_file_read("nodes.html.erb")
 end
 
 file = ARGV.shift
@@ -54,11 +75,6 @@ unless File.exists? file
 end
 
 output = ARGV.shift
-
 puts "Rendering profiling from '#{file}' to '#{output}'"
-
 data = JSON.load(File.read(file))
-
-template = File.join(project_root, "projects", "profiler", "output.html.erb")
-template = File.join(project_root, "projects", "profiler", "output.html.erb")
-File.open(output, "w").puts(ERB.new(File.open(template).read).result(binding))
+File.open(output, "w").puts(ERB.new(template).result(binding))
