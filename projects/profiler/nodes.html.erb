@@ -1,0 +1,24 @@
+<% if node["sub_nodes"].empty? %>
+  <li class="color<%= color %>" style="display:block">
+  <img src="http://asset.rubini.us/empty.png"/>
+  <%= prec %> (<%= self_prec %>%) <%= name %>!
+<% else %>
+  <% if depth > 20 %>
+    <li class="color<%= color %>" style="display:block">
+    <img class="toggle" src="http://asset.rubini.us/plus.png">
+    <%= prec %>% (<%= self_prec %>%) <%= name %>!
+    <ul style="display:none">
+  <% else %>
+    <li class="color<%= color %>" style="display:block">
+    <img class="toggle" src="http://asset.rubini.us/minus.png">
+    <%= prec %>% (<%= self_prec %>%) <%= name %>!
+    <ul>
+  <% end %>
+
+  <% sub_nodes(node, data).reverse_each do |s_id| %>
+    <%= print_node(s_id, data, depth + 1) %>
+  <% end %>
+
+  </ul>
+<% end %>
+</li>

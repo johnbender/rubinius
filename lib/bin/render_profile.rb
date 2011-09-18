@@ -28,33 +28,22 @@ def print_node(id, data, depth=0)
 
   self_prec = "%.2f" % [100.0 * (s / data['runtime'].to_f)]
 
-  if node["sub_nodes"].empty?
-    output += %Q!<li class="color#{color}" style="display:block"><img src="http://asset.rubini.us/empty.png"> #{prec}% (#{self_prec}%) #{name}!
-  else
-    if depth > 20
-      output += %Q!<li class="color#{color}" style="display:block"><img class="toggle" src="http://asset.rubini.us/plus.png"> #{prec}% (#{self_prec}%) #{name}!
-      output += "<ul style=\"display:none\">"
+  template = File.join(project_root, "projects", "profiler", "nodes.html.erb")
+  ERB.new(File.open(template).read).result(binding)
+end
+
+def sub_nodes(node, data)
+  node["sub_nodes"].sort_by do |s|
+    if n = data["nodes"][s.to_s]
+      n["total"].to_f / data["runtime"]
     else
-      output += %Q!<li class="color#{color}" style="display:block"><img class="toggle" src="http://asset.rubini.us/minus.png"> #{prec}% (#{self_prec}%) #{name}!
-      output += "<ul>"
+      0
     end
-
-    subs = node["sub_nodes"].sort_by do |s|
-      if n = data["nodes"][s.to_s]
-        n["total"].to_f / data["runtime"]
-      else
-        0
-      end
-    end
-
-    subs.reverse_each do |s_id|
-      output += print_node(s_id, data, depth + 1)
-    end
-
-    output += "</ul>"
   end
+end
 
-  output += "</li>"
+def project_root
+  Pathname.new(File.expand_path('../../../', __FILE__))
 end
 
 file = ARGV.shift
@@ -69,7 +58,7 @@ output = ARGV.shift
 puts "Rendering profiling from '#{file}' to '#{output}'"
 
 data = JSON.load(File.read(file))
-project_root = Pathname.new(File.expand_path('../../../', __FILE__))
-template = File.join(project_root, "projects", "profiler", "output.html.erb")
 
+template = File.join(project_root, "projects", "profiler", "output.html.erb")
+template = File.join(project_root, "projects", "profiler", "output.html.erb")
 File.open(output, "w").puts(ERB.new(File.open(template).read).result(binding))
